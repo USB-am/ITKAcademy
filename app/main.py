@@ -7,13 +7,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 
 from app.api.v1.router import api_router
-# from core.database import create_db_and_tables
+# from app.modules.wallets import models
+# from app.core.database import create_db_and_tables
 
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     # await create_db_and_tables()
-    print(f'lifespan func is started')
+    print('lifespan func is started')
     yield
     print(f'lifespan func is finished')
 

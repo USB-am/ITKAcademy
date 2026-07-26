@@ -17,7 +17,7 @@ class OperationType(Enum):
 
 
 @wallets_router.get('/{wallet_id}', response_model=WalletResponse)
-def get_wallet_balance(wallet_id: UUID):
+async def get_wallet_balance(wallet_id: UUID):
     balance = 1.0
     return WalletResponse(
         uuid=wallet_id,
@@ -26,7 +26,7 @@ def get_wallet_balance(wallet_id: UUID):
 
 
 @wallets_router.post('/{wallet_id}/operation')
-def post_wallet_operation(wallet_id: UUID,
+async def post_wallet_operation(wallet_id: UUID,
                           amount: float,
                           operation_type: OperationType):
 
@@ -43,7 +43,7 @@ def post_wallet_operation(wallet_id: UUID,
 
 
 @wallets_router.post('/add', response_model=WalletResponse)
-def add_new_wallet():
+async def add_new_wallet():
     new_wallet = Wallet()
     return WalletResponse(
         uuid=new_wallet.id,
