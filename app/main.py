@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-from typing import Callable
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.v1.router import api_router
-# from app.modules.wallets import models
-# from app.core.database import create_db_and_tables
 
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    # await create_db_and_tables()
     print('lifespan func is started')
     yield
     print(f'lifespan func is finished')
@@ -22,16 +19,27 @@ async def lifespan(application: FastAPI):
 application = FastAPI(lifespan=lifespan)
 application.include_router(api_router)
 
-# from core.config import auth
-# auth.handle_errors(application)
+
+class LogRequestsMiddleware:
+    def __init__(self, app: ASGIApp):
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        request = Request(scope, receive=receive)
+        start_time = time.perf_counter()
+
+        async def send_wrapper(message):
+            if message["type"] == "http.response.start":
+                status_code = message["status"]
+                process_time = (time.perf_counter() - start_time) * 1000
+                print(f'Completed in {process_time:.2f}ms - Status: {status_code}')
+            await send(message)
+        await self.app(scope, receive, send_wrapper)
 
 
-@application.middleware('http')
-async def log_requests(request: Request, call_next: Callable):
-    start_time = datetime.now()
+application.add_middleware(LogRequestsMiddleware)
 
-    response = await call_next(request)
-
-    process_time = (datetime.now() - start_time).total_seconds() * 1000
-    print(f'Completed in {process_time:.2f}ms - Status: {response.status_code}')
-    return response

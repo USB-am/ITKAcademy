@@ -1,13 +1,14 @@
 from uuid import UUID
 from decimal import Decimal
 
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
 from app.core.database import TSession
 from app.modules.wallets.schemas import WalletResponse
 from app.modules.wallets.models import Wallet
 from app.modules.wallets.utils import OperationType
 from app.modules.wallets.service import WalletService
+from app.modules.wallets.repository import WalletRepository
 
 
 wallets_router = APIRouter(prefix='/wallets', tags=['Wallets',])
@@ -17,6 +18,7 @@ wallets_router = APIRouter(prefix='/wallets', tags=['Wallets',])
     '/{wallet_id}',
     summary='Get wallet balance',
     description='Get wallet balance by wallet_id',
+    status_code=status.HTTP_200_OK,
     response_model=WalletResponse)
 async def get_wallet_balance(wallet_id: UUID, session: TSession):
     service = WalletService(session)
@@ -32,6 +34,7 @@ async def get_wallet_balance(wallet_id: UUID, session: TSession):
     '/{wallet_id}/operation',
     summary='Update wallet balance',
     description='Send request to update Wallet.balance',
+    status_code=status.HTTP_200_OK,
     response_model=WalletResponse)
 async def post_wallet_operation(wallet_id: UUID,
                                 amount: Decimal,
@@ -54,6 +57,7 @@ async def post_wallet_operation(wallet_id: UUID,
     '/add',
     summary='Add wallet',
     description='Add new Wallet to DB',
+    status_code=status.HTTP_201_CREATED,
     response_model=WalletResponse)
 async def add_new_wallet(session: TSession):
     new_wallet = Wallet()
