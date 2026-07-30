@@ -14,7 +14,7 @@ from app.core.database import Base, get_session
 from app.modules.wallets.models import Wallet
 
 
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:admin@localhost/wallet_db_test"
+TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@wallet_db/wallet_db_test"
 
 
 @pytest_asyncio.fixture(scope="session")
