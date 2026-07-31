@@ -62,7 +62,7 @@ async def client(session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
 
 @pytest_asyncio.fixture
 async def wallet(session: AsyncSession) -> Wallet:
-    new_wallet = Wallet(balance=Decimal("100.00"))
+    new_wallet = Wallet(balance=Decimal("0.00"))
     session.add(new_wallet)
     await session.commit()
     await session.refresh(new_wallet)
